@@ -5,64 +5,150 @@
 
 #include "private/internal.hpp"  // это не тот приват, о котором вы могли подумать
 
-namespace itis {
+namespace itis
+{
 
-void LinkedList::Add(Element e) {
+void LinkedList::Add(Element e)
+{
   // Tip 1: создайте узел в куче с переданным значением
   // Tip 2: есть 2 случая - список пустой и непустой
   // Tip 3: не забудьте обновить поля head и tail
-  // напишите свой код здесь ...
+    Node * node = new Node(e, nullptr);
+    if (size_ == 0)
+    {
+        size_ ++;
+        head_ = node;
+        tail_ = node;
+    }
+    else
+    {
+        tail_ -> next = node;
+        tail_ = node;
+        size_ ++;
+    }
 }
 
-void LinkedList::Insert(int index, Element e) {
+void LinkedList::Insert(int index, Element e)
+{
   internal::check_out_of_range(index, 0, size_ + 1);
 
   // Tip 1: вставка элементов на позицию size эквивалентно операции добавления в конец
-  // Tip 2: рассмотрите несколько случаев:
-  //        (1) список пустой,
-  //        (2) добавляем в начало списка,
-  //        (3) добавляем в конец списка
-  //        (4) все остальное
 
-  // напишите свой код здесь ...
+    if (index == size_)
+    {
+        LinkedList::Add(e);
+        return;
+    }
+
+
+    if (index == 0)
+    {
+        Node *new_node = new Node(e, head_);
+        head_ = new_node;
+        size_ ++;
+        return;
+    }
+
+    Node *current_node = find_node(index - 1);
+    Node *node = new Node(e, current_node -> next);
+    current_node -> next = node;
+    size_ ++;
+
 }
 
-void LinkedList::Set(int index, Element e) {
+
+void LinkedList::Set(int index, Element e)
+{
   internal::check_out_of_range(index, 0, size_);
   // Tip 1: используйте функцию find_node(index)
-  // напишите свой код здесь ...
+    Node *current_node = find_node(index);
+    current_node -> data = e;
 }
 
-Element LinkedList::Remove(int index) {
+Element LinkedList::Remove(int index)
+{
   internal::check_out_of_range(index, 0, size_);
   // Tip 1: рассмотрите случай, когда удаляется элемент в начале списка
   // Tip 2: используйте функцию find_node(index)
-  // напишите свой код здесь ...
-  return {};
+
+    if (index == 0)
+    {
+        Node *new_head = head_ -> next;
+        Element ret_value = head_ -> data;
+        delete head_;
+        head_ = new_head;
+        size_ --;
+        return ret_value;
+    }
+    Node *current_node = find_node(index - 1);
+    Node *delete_node = current_node -> next;
+    current_node -> next = delete_node -> next;
+    if (index == size_ -1)
+        tail_ = current_node;
+    size_ --;
+    Element ret_value = delete_node -> data;
+    delete delete_node;
+    return ret_value;
 }
 
-void LinkedList::Clear() {
+
+void LinkedList::Clear() 
+{
   // Tip 1: люди в черном (MIB) пришли стереть вам память
-  // напишите свой код здесь ...
+  
+    Node *current_node = head_;
+    Node *delete_node;
+    size_ = 0;
+    head_ = nullptr;
+    tail_ = nullptr;
+
+    while (current_node != nullptr) 
+    {
+        delete_node = current_node;
+        current_node = current_node -> next;
+        delete delete_node;
+    }
 }
 
-Element LinkedList::Get(int index) const {
+Element LinkedList::Get(int index) const
+{
   internal::check_out_of_range(index, 0, size_);
-  // напишите свой код здесь ...
-  return {};
+  Node *curr_node = find_node(index);
+  return curr_node -> data;
+
 }
 
-int LinkedList::IndexOf(Element e) const {
-  // напишите свой код здесь ...
-  return {};
+int LinkedList::IndexOf(Element e) const 
+{
+    int i = 0;
+    for (Node *curr_node = head_; curr_node != nullptr; curr_node = curr_node -> next)
+    {
+        if (curr_node -> data == e)
+            return i;
+        i ++;
+    }
+    return -1;
 }
 
-Node *LinkedList::find_node(int index) const {
+Node *LinkedList::find_node(int index) const
+{
   assert(index >= 0 && index < size_);
+  if (index == size_ - 1)
+    return tail_;
+  if (index == 0)
+    return head_;
+  int counter = 0;
+
   // Tip 1: можете сразу обработать случаи поиска начала и конца списка
-  // напишите свой код здесь ...
-  return {};
+  for (Node* current_node = head_; current_node != nullptr; current_node = current_node -> next)
+  {
+    if (counter == index)
+        return current_node;
+    counter ++;
+  }
+    return {};
 }
+
 
 // РЕАЛИЗОВАНО
 
